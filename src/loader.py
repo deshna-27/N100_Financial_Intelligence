@@ -1,23 +1,45 @@
-import pandas as pd
 import os
+import sqlite3
+import pandas as pd
 
-RAW_FOLDER = "data/raw"
-
-files = os.listdir(RAW_FOLDER)
+DB_PATH = "db/nifty100.db"
+DATA_FOLDER = "data/processed"
+OUTPUT_FILE = "output/load_audit.csv"
 
 print("=" * 60)
-print("N100 DATA LOADER")
+print("FULL DATA LOADER")
 print("=" * 60)
 
-for file in files:
+conn = sqlite3.connect(DB_PATH)
+
+audit = []
+
+for file in os.listdir(DATA_FOLDER):
 
     if file.endswith(".xlsx"):
 
-        path = os.path.join(RAW_FOLDER, file)
+        path = os.path.join(DATA_FOLDER, file)
+
+        table_name = file.replace(".xlsx", "")
 
         df = pd.read_excel(path)
 
-        print("\nFile :", file)
-        print("Rows :", df.shape[0])
-        print("Columns :", df.shape[1])
-        print(df.head())
+        df.to_sql(table_name, conn, if_exists="replace", index=False)
+
+        rows = len(df)
+
+        audit.append({
+            "table": table_name,
+            "rows_loaded": rows
+        })
+
+        print(f"{table_name:<20} {rows} rows loaded")
+
+audit_df = pd.DataFrame(audit)
+
+audit_df.to_csv(OUTPUT_FILE, index=False)
+
+conn.close()
+
+print("\nDatabase updated successfully.")
+print("Load audit generated.")

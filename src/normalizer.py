@@ -45,7 +45,10 @@ for file in os.listdir(RAW_FOLDER):
 
         path = os.path.join(RAW_FOLDER, file)
 
-        df = pd.read_excel(path)
+        if file == "companies.xlsx":
+            df = pd.read_excel(path, header=1)
+        else:
+            df = pd.read_excel(path)
 
         df = normalize_columns(df)
         df = normalize_ticker(df)

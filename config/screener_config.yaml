@@ -1,0 +1,13 @@
+filters:
+
+  roe:
+    min: 15
+
+  debt_to_equity:
+    max: 1
+
+  revenue_cagr:
+    min: 10
+
+  net_profit_margin:
+    min: 10
